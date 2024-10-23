@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form action="" method="get">
+    <input type="text" name="q">
+    <button>search</button>
+</form>
+
+<div>
+    {% for product in products %}
+        <div>
+            <h3>{{ product.name }}</h3>
+            <p>
+                {{ product.description }}
+            </p>
+            <strong>Price: {{ product.price }}</strong> | <strong>Quantity: {{ product.quantity }}</strong>
+        </div>
+        <hr>
+    {% endfor %}
+
+</div>
+
+</body>
+</html>
