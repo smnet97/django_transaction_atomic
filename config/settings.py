@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = "django-insecure-*7)9lm7vnnri=)rud$jzuk$ca$#b772ejg=&b6&o$f6j@1rht3
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -41,13 +39,17 @@ INSTALLED_APPS = [
     "order",
     "product",
     "user",
+    "book",
     "notification",
     "crispy_forms",
     "crispy_bootstrap5",
     "django_celery_beat",
+    "debug_toolbar",
+    'django_prometheus',
 ]
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -55,6 +57,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -88,7 +92,11 @@ CHANNEL_LAYERS = {
     },
 }
 
-
+CACHES = {
+    "default": {
+        "BACKEND": "django_prometheus.cache.backends.redis.RedisCache",
+    }
+}
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -96,9 +104,21 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
+    },
+    # "second": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "second.sqlite3",
+    # },
+    'second': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'second',
+        'USER': 'root',
+        'PASSWORD': 'Qwerty123$',
+        'HOST': 'localhost',  # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
     }
-}
 
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -118,7 +138,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -129,7 +148,6 @@ TIME_ZONE = "Asia/Tashkent"
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -156,3 +174,11 @@ CELERY_TIMEZONE = "Asia/Tashkent"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+DATABASE_ROUTERS = [
+    "config.router.BookRouter"
+]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
